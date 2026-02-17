@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mijn Pendel | Breda</title>
+    <title>Thuisreis | Breda -> Chaam</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,15 +11,14 @@
 
     <style>
         :root {
-            /* Kleurenpalet (Donker & Modern) */
             --bg-body: #0f172a;
             --bg-card: #1e293b;
-            --border-color: #334155;
+            --border: #334155;
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
-            
-            --accent-green: #10b981;
-            --accent-blue: #3b82f6;
+            --accent-green: #10b981; /* Fiets */
+            --accent-blue: #3b82f6;  /* Bus */
+            --accent-purple: #a855f7; /* Lopen/Thuis */
             --accent-red: #ef4444;
             --accent-orange: #f59e0b;
         }
@@ -35,247 +34,135 @@
             min-height: 100vh;
         }
 
-        /* --- HEADER --- */
+        /* HEADER */
         header {
-            background-color: rgba(30, 41, 59, 0.8);
+            background: rgba(30, 41, 59, 0.9);
             backdrop-filter: blur(10px);
             padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
         }
 
-        .logo {
-            font-weight: 800;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            letter-spacing: -0.5px;
-        }
-        .logo i { color: var(--accent-green); }
+        .logo { font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .logo i { color: var(--accent-purple); }
 
         .settings-btn {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            width: 40px; height: 40px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.2s;
-            display: grid; place-items: center;
+            background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+            width: 40px; height: 40px; border-radius: 10px; cursor: pointer; display: grid; place-items: center;
         }
-        .settings-btn:hover { background: var(--border-color); color: #fff; }
 
-        /* --- MAIN GRID LAYOUT --- */
+        /* GRID */
         main {
-            flex: 1;
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem;
-            
-            display: grid;
-            gap: 1rem;
-            /* MOBILE DEFAULT: 1 kolom */
+            flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; padding: 1rem;
+            display: grid; gap: 1rem;
             grid-template-columns: 1fr;
-            grid-template-areas: 
-                "hero"
-                "map"
-                "list";
+            grid-template-areas: "hero" "map" "list";
         }
 
-        /* TABLET & DESKTOP (Vanaf 768px) */
         @media (min-width: 768px) {
             main {
                 padding: 2rem;
-                grid-template-columns: 1.5fr 1fr; /* Links breed, rechts smal */
+                grid-template-columns: 1.5fr 1fr;
                 grid-template-rows: auto 1fr;
-                grid-template-areas: 
-                    "hero list"
-                    "map list";
+                grid-template-areas: "hero list" "map list";
             }
         }
 
-        /* --- CARDS --- */
+        /* CARDS */
         .card {
-            background-color: var(--bg-card);
-            border-radius: 16px;
-            padding: 1.5rem;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
+            background: var(--bg-card); border-radius: 16px; padding: 1.5rem;
+            border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column;
         }
-
         .card-title {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            color: var(--text-muted);
-            margin-bottom: 1rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);
+            margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;
         }
 
-        /* HERO CARD (Countdown) */
+        /* HERO SECTION */
         .area-hero { grid-area: hero; }
+        .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
         
-        .hero-content {
-            text-align: center;
-            padding: 1rem 0;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 99px;
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--accent-green);
-            font-weight: 600;
-            font-size: 0.85rem;
-            margin-bottom: 0.5rem;
-        }
-
+        .hero-main { grid-column: 1 / -1; margin-bottom: 15px; text-align: center; }
+        
         .big-time {
-            /* Responsieve tekstgrootte: past zich aan schermbreedte aan */
-            font-size: clamp(3.5rem, 10vw, 6rem); 
-            font-weight: 800;
-            color: var(--text-main);
-            line-height: 1;
-            font-variant-numeric: tabular-nums;
-            letter-spacing: -2px;
-        }
-
-        .countdown-sub {
-            font-size: 1.1rem;
-            margin-top: 0.5rem;
-            color: var(--text-muted);
+            font-size: clamp(3rem, 8vw, 5rem); font-weight: 800; color: var(--text-main);
+            line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -2px;
         }
         
+        .sub-time-label { font-size: 0.9rem; color: var(--accent-green); font-weight: 600; margin-bottom: 5px; }
+        .countdown-sub { font-size: 1rem; color: var(--text-muted); margin-top: 5px; }
         .countdown-sub.urgent { color: var(--accent-orange); }
         .countdown-sub.critical { color: var(--accent-red); font-weight: 700; animation: pulse 2s infinite; }
 
+        .arrival-box {
+            background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .arrival-time { font-size: 1.5rem; font-weight: 700; color: var(--accent-purple); }
+        .arrival-label { font-size: 0.75rem; color: var(--text-muted); }
+
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
-        /* MAP CARD */
+        /* MAP */
         .area-map { grid-area: map; min-height: 300px; }
-        
-        #map {
-            flex: 1;
-            width: 100%;
-            min-height: 250px;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-            z-index: 1;
-        }
-
-        .map-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
+        #map { flex: 1; width: 100%; min-height: 250px; border-radius: 12px; margin-bottom: 1rem; z-index: 1; }
+        .map-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn {
-            padding: 12px;
-            border-radius: 10px;
-            text-decoration: none;
-            text-align: center;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: transform 0.1s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
+            padding: 12px; border-radius: 10px; text-decoration: none; text-align: center;
+            font-weight: 600; font-size: 0.9rem; display: flex; justify-content: center; align-items: center; gap: 8px;
+            color: #fff; transition: transform 0.1s;
         }
         .btn:active { transform: scale(0.98); }
+        .btn-nav { background: var(--accent-green); color: #000; }
+        .btn-ov { background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); }
 
-        .btn-primary { background: var(--accent-green); color: #000; }
-        .btn-secondary { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid var(--border-color); }
-
-        /* LIST CARD */
+        /* LIST */
         .area-list { grid-area: list; max-height: 100%; overflow: hidden; }
-        
-        .scroll-container {
-            overflow-y: auto;
-            /* Verberg scrollbar maar laat wel scrollen */
-            scrollbar-width: thin;
-            scrollbar-color: var(--border-color) transparent;
-        }
+        .scroll-container { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
 
         .timetable-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.95rem;
+            display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+            padding: 15px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem;
         }
         .timetable-item:last-child { border-bottom: none; }
-        
-        .timetable-item.past { opacity: 0.4; }
+        .timetable-item.past { opacity: 0.3; }
         .timetable-item.active { 
-            background: rgba(16, 185, 129, 0.05); 
-            padding: 12px 10px; 
-            margin: 0 -10px; 
-            border-radius: 8px;
-            border-bottom: none;
+            background: linear-gradient(90deg, rgba(16,185,129,0.1), rgba(168,85,247,0.1));
+            border-radius: 8px; padding: 15px 10px; margin: 0 -10px; border: none;
         }
 
-        .time-group { display: flex; flex-direction: column; }
-        .time-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
-        .time-val { font-weight: 600; font-size: 1.1rem; }
-        .active .time-val { color: var(--accent-green); }
-
-        /* FOOTER */
-        footer {
-            text-align: center;
-            padding: 1.5rem;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        /* MODAL (Instellingen) */
-        .modal {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: flex-end; /* Mobile: sheet from bottom */
-        }
+        .col-left { text-align: left; }
+        .col-right { text-align: right; }
+        .col-mid { color: var(--text-muted); font-size: 0.8rem; padding: 0 10px; display: flex; flex-direction: column; align-items: center; }
         
-        @media (min-width: 768px) { .modal { align-items: center; } }
+        .t-main { font-weight: 700; font-size: 1.1rem; display: block; }
+        .t-sub { font-size: 0.75rem; color: var(--text-muted); }
+        .active .t-main { color: var(--accent-green); }
+        .active .col-right .t-main { color: var(--accent-purple); }
 
+        /* MODAL */
+        .modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000;
+            justify-content: center; align-items: flex-end; backdrop-filter: blur(5px);
+        }
+        @media (min-width: 768px) { .modal { align-items: center; } }
         .modal-content {
-            background: var(--bg-card);
-            width: 100%;
-            max-width: 500px;
-            padding: 2rem;
-            border-radius: 20px 20px 0 0; /* Rounded top */
-            border: 1px solid var(--border-color);
+            background: var(--bg-card); width: 100%; max-width: 500px; padding: 2rem;
+            border-radius: 20px 20px 0 0; border: 1px solid var(--border);
             animation: slideUp 0.3s ease-out;
         }
-
         @media (min-width: 768px) { .modal-content { border-radius: 20px; } }
-
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        .input-group { margin-bottom: 1.5rem; }
-        .input-group label { display: block; margin-bottom: 0.5rem; color: var(--text-muted); }
+        .input-group { margin-bottom: 1rem; }
+        .input-group label { display: block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.9rem;}
         .input-group input { 
-            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); 
-            background: var(--bg-body); color: #fff; font-size: 1.1rem;
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); 
+            background: var(--bg-body); color: #fff; font-size: 1rem;
         }
+        .save-btn { width: 100%; padding: 12px; background: var(--accent-green); border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; margin-top: 10px; cursor: pointer;}
 
     </style>
 </head>
@@ -283,8 +170,8 @@
 
     <header>
         <div class="logo">
-            <i class="fa-solid fa-bolt"></i>
-            <span>Commuter</span>
+            <i class="fa-solid fa-house-chimney"></i>
+            <span>Breda <i class="fa-solid fa-arrow-right" style="font-size:0.7em; margin:0 3px;"></i> Chaam</span>
         </div>
         <button class="settings-btn" onclick="openSettings()">
             <i class="fa-solid fa-sliders"></i>
@@ -293,64 +180,82 @@
 
     <main>
         <section class="card area-hero">
-            <div class="card-title"><i class="fa-regular fa-clock"></i> Vertrekadvies</div>
-            <div class="hero-content">
-                <div class="status-badge" id="bus-info-badge">--</div>
+            <div class="card-title"><i class="fa-solid fa-stopwatch"></i> Actueel Advies</div>
+            
+            <div class="hero-main">
+                <div class="sub-time-label">VERTREK FIETS (TRAMSINGEL)</div>
                 <div class="big-time" id="leave-time">--:--</div>
-                <div class="countdown-sub" id="countdown-text">Route laden...</div>
+                <div class="countdown-sub" id="countdown-text">Berekenen...</div>
+            </div>
+
+            <div class="hero-grid">
+                <div class="arrival-box">
+                    <span class="arrival-label"><i class="fa-solid fa-bus"></i> BUS 375</span>
+                    <span class="arrival-time" id="bus-dep-time" style="color:var(--accent-blue)">--:--</span>
+                </div>
+                <div class="arrival-box">
+                    <span class="arrival-label"><i class="fa-solid fa-door-open"></i> THUIS (ALPHEN.)</span>
+                    <span class="arrival-time" id="home-arr-time">--:--</span>
+                </div>
             </div>
         </section>
 
         <section class="card area-map">
-            <div class="card-title"><i class="fa-solid fa-map-location-dot"></i> Live Route</div>
+            <div class="card-title"><i class="fa-solid fa-map-location-dot"></i> Jouw Route</div>
             <div id="map"></div>
             <div class="map-buttons">
-                <a href="https://www.google.com/maps/dir/Tramsingel,+Breda/Station+Breda" target="_blank" class="btn btn-primary">
-                    <i class="fa-solid fa-bicycle"></i> Fietsnav
+                <a href="https://www.google.com/maps/dir/Tramsingel,+Breda/Station+Breda" target="_blank" class="btn btn-nav">
+                    <i class="fa-solid fa-bicycle"></i> Start Navigatie
                 </a>
-                <a href="https://9292.nl/" target="_blank" class="btn btn-secondary">
-                    <i class="fa-solid fa-bus"></i> OV Info
+                <a href="https://9292.nl/" target="_blank" class="btn btn-ov">
+                    <i class="fa-solid fa-bus"></i> 9292 App
                 </a>
             </div>
         </section>
 
         <section class="card area-list">
-            <div class="card-title"><i class="fa-solid fa-list-ul"></i> Latere Opties</div>
+            <div class="card-title"><i class="fa-solid fa-timeline"></i> Tijdlijn Vandaag</div>
             <div class="scroll-container">
                 <div id="timetable-list"></div>
             </div>
         </section>
     </main>
 
-    <footer>
-        Tramsingel <i class="fa-solid fa-arrow-right" style="margin:0 5px; font-size:0.7em;"></i> Chaam<br>
-        <span style="opacity: 0.5; margin-top:5px; display:block;">Versie 4.0 Responsive</span>
-    </footer>
-
     <div class="modal" id="settings-modal">
         <div class="modal-content">
-            <h2 style="margin-bottom: 1.5rem; color:white;">Instellingen</h2>
+            <h2 style="margin-bottom: 1.5rem; color:white;">Reis Instellingen</h2>
             <div class="input-group">
-                <label>Fietstijd (minuten)</label>
-                <input type="number" id="input-bike" inputmode="numeric">
+                <label>Fietstijd Tramsingel -> Station (min)</label>
+                <input type="number" id="input-bike">
             </div>
             <div class="input-group">
-                <label>Buffer / Lopen (minuten)</label>
-                <input type="number" id="input-buffer" inputmode="numeric">
+                <label>Buffer / Lopen naar perron (min)</label>
+                <input type="number" id="input-buffer">
             </div>
-            <button class="btn btn-primary" style="width:100%" onclick="saveSettings()">Opslaan</button>
-            <button class="btn btn-secondary" style="width:100%; margin-top:10px; border:none;" onclick="closeSettings()">Annuleren</button>
+            <hr style="border-color:var(--border); margin: 15px 0;">
+            <div class="input-group">
+                <label>Busrit duur (CS -> Meysberg) (min)</label>
+                <input type="number" id="input-bus-duration">
+            </div>
+            <div class="input-group">
+                <label>Lopen Meysberg -> Thuis (min)</label>
+                <input type="number" id="input-walk-home">
+            </div>
+            <button class="save-btn" onclick="saveSettings()">Opslaan & Sluiten</button>
         </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // CONFIG & STATE
+        // --- 1. CONFIG & STATE ---
         let config = {
             bikeTime: parseInt(localStorage.getItem('bikeTime')) || 10,
-            bufferTime: parseInt(localStorage.getItem('bufferTime')) || 2
+            bufferTime: parseInt(localStorage.getItem('bufferTime')) || 2,
+            busDuration: parseInt(localStorage.getItem('busDuration')) || 23, // 23 min rit
+            walkHome: parseInt(localStorage.getItem('walkHome')) || 5       // 5 min lopen
         };
 
+        // Vertrektijden Bus 375 vanaf Breda CS
         const DIENSTREGELING = {
             6: [25, 55], 7: [25, 55], 8: [25, 55], 9: [25, 55], 10: [25, 55],
             11: [25, 55], 12: [25, 55], 13: [25, 55], 14: [25, 55], 15: [25, 55],
@@ -358,8 +263,7 @@
             20: [25, 55], 21: [25], 22: [25], 23: [25]
         };
 
-        // --- CORE FUNCTIES ---
-
+        // --- 2. LOGICA ---
         function updateApp() {
             const nu = new Date();
             const listContainer = document.getElementById('timetable-list');
@@ -367,59 +271,79 @@
 
             let nextOption = null;
             let totalDelay = config.bikeTime + config.bufferTime;
-            let optionsCount = 0;
-
+            
+            // Loop door de dag
             for (let uur = 0; uur < 24; uur++) {
                 if (DIENSTREGELING[uur]) {
                     for (let minuut of DIENSTREGELING[uur]) {
                         
+                        // 1. Bus Vertrek (CS)
                         let busDate = new Date(nu);
                         busDate.setHours(uur, minuut, 0);
+                        
+                        // 2. Fiets Vertrek (Tramsingel)
                         let vertrekDate = new Date(busDate.getTime() - (totalDelay * 60000));
 
+                        // 3. Aankomst Halte Meysberg
+                        let halteDate = new Date(busDate.getTime() + (config.busDuration * 60000));
+
+                        // 4. Thuis (Alphensebaan)
+                        let thuisDate = new Date(halteDate.getTime() + (config.walkHome * 60000));
+
+                        // Strings maken
                         let busStr = busDate.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
                         let vertrekStr = vertrekDate.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
+                        let thuisStr = thuisDate.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
 
                         let div = document.createElement('div');
                         div.className = "timetable-item";
 
+                        // Is deze rit al geweest? (Kijken naar fiets vertrek)
                         if (vertrekDate < nu) {
                             div.classList.add('past');
                         } else {
+                            // Eerstvolgende toekomstige rit
                             if (!nextOption) {
-                                nextOption = { vertrek: vertrekDate, bus: busStr };
+                                nextOption = { 
+                                    vertrek: vertrekDate, 
+                                    bus: busStr,
+                                    thuis: thuisStr 
+                                };
                                 div.classList.add('active');
-                                // Scroll element into view if needed (optional logic)
                             }
                         }
 
-                        // Alleen tonen als het vandaag is en niet té lang geleden
-                        // We tonen de afgelopen 1 uur en de komende uren
+                        // Toon in lijst (alles van afgelopen uur tot eind vd dag)
                         if (vertrekDate > new Date(nu.getTime() - 3600000)) {
                             div.innerHTML = `
-                                <div class="time-group">
-                                    <span class="time-label">Vertrek Fiets</span>
-                                    <span class="time-val">${vertrekStr}</span>
+                                <div class="col-left">
+                                    <span class="t-main">${vertrekStr}</span>
+                                    <span class="t-sub">Tramsingel</span>
                                 </div>
-                                <i class="fa-solid fa-arrow-right" style="color:var(--text-muted); font-size:0.8rem;"></i>
-                                <div class="time-group" style="text-align:right;">
-                                    <span class="time-label">Bus 375</span>
-                                    <span class="time-val">${busStr}</span>
+                                <div class="col-mid">
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                    <span style="font-size:0.7em">Bus ${busStr}</span>
+                                </div>
+                                <div class="col-right">
+                                    <span class="t-main">${thuisStr}</span>
+                                    <span class="t-sub">Thuis</span>
                                 </div>
                             `;
                             listContainer.appendChild(div);
-                            optionsCount++;
                         }
                     }
                 }
             }
 
-            // UPDATE UI
+            // --- 3. UI UPDATE (Hero Card) ---
             if (nextOption) {
-                document.getElementById('bus-info-badge').innerText = `Bus ${nextOption.bus} (Breda CS)`;
+                // Tijden invullen
                 document.getElementById('leave-time').innerText = nextOption.vertrek.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
-                
-                const diff = Math.floor((nextOption.vertrek - nu) / 1000);
+                document.getElementById('bus-dep-time').innerText = nextOption.bus;
+                document.getElementById('home-arr-time').innerText = nextOption.thuis;
+
+                // Countdown logic
+                const diff = Math.floor((nextOption.vertrek - nu) / 1000); // seconden
                 const min = Math.floor(diff / 60);
                 const sec = diff % 60;
                 
@@ -446,59 +370,73 @@
                 }
             } else {
                 document.getElementById('leave-time').innerText = "--:--";
-                document.getElementById('countdown-text').innerText = "Geen bussen meer";
+                document.getElementById('countdown-text').innerText = "Welterusten";
             }
         }
 
-        // --- KAART ---
-        var map = L.map('map', {zoomControl: false}).setView([51.549, 4.815], 11);
+        // --- 4. MAP SETUP (Met Meysberg & Alphensebaan) ---
+        var map = L.map('map', {zoomControl: false}).setView([51.55, 4.81], 11);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
 
+        // Coordinaten
         var tramsingel = [51.5955, 4.7675];
         var station = [51.5933, 4.7797];
-        var chaam = [51.5039, 4.8622];
+        var meysberg = [51.5085, 4.8605]; // Busstop Meysberg Chaam (ongeveer)
+        var thuis = [51.5035, 4.8655];    // Alphensebaan 6 (ongeveer)
 
-        // Lijnen
+        // Routes tekenen
+        // 1. Fiets (Groen Stippel)
         L.polyline([tramsingel, station], {color: '#10b981', weight: 4, dashArray: '6, 8'}).addTo(map);
-        L.polyline([station, chaam], {color: '#3b82f6', weight: 4}).addTo(map);
-        
-        // Markers
-        L.circleMarker(tramsingel, {color: '#10b981', radius: 6, fillOpacity:1, fillColor:'#fff'}).addTo(map);
-        L.circleMarker(station, {color: '#fff', radius: 4, fillOpacity:1}).addTo(map);
-        L.circleMarker(chaam, {color: '#3b82f6', radius: 6, fillOpacity:1, fillColor:'#fff'}).addTo(map);
-        
-        // Auto-fit bounds (eenmalig bij start)
-        map.fitBounds([tramsingel, chaam], {padding: [30, 30]});
+        // 2. Bus (Blauw)
+        L.polyline([station, meysberg], {color: '#3b82f6', weight: 4}).addTo(map);
+        // 3. Lopen (Paars Stippel)
+        L.polyline([meysberg, thuis], {color: '#a855f7', weight: 4, dashArray: '4, 6'}).addTo(map);
 
-        // --- SETTINGS LOGIC ---
+        // Markers
+        L.circleMarker(tramsingel, {color: '#10b981', radius: 4, fillOpacity:1, fillColor:'#fff'}).addTo(map);
+        L.circleMarker(station, {color: '#fff', radius: 3}).addTo(map);
+        L.circleMarker(meysberg, {color: '#3b82f6', radius: 4, fillOpacity:1, fillColor:'#fff'}).addTo(map);
+        
+        // Huis Icoon Marker
+        var homeIcon = L.divIcon({
+            html: '<i class="fa-solid fa-house" style="color:#a855f7; font-size:16px;"></i>',
+            className: 'home-marker',
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
+        L.marker(thuis, {icon: homeIcon}).addTo(map);
+
+        map.fitBounds([tramsingel, thuis], {padding: [30, 30]});
+
+        // --- 5. SETTINGS INTERACTION ---
         function openSettings() {
             document.getElementById('input-bike').value = config.bikeTime;
             document.getElementById('input-buffer').value = config.bufferTime;
+            document.getElementById('input-bus-duration').value = config.busDuration;
+            document.getElementById('input-walk-home').value = config.walkHome;
             document.getElementById('settings-modal').style.display = 'flex';
         }
 
-        function closeSettings() {
-            document.getElementById('settings-modal').style.display = 'none';
-        }
-
         function saveSettings() {
-            const bikeVal = parseInt(document.getElementById('input-bike').value);
-            const bufVal = parseInt(document.getElementById('input-buffer').value);
-            if(bikeVal && bufVal) {
-                config.bikeTime = bikeVal;
-                config.bufferTime = bufVal;
-                localStorage.setItem('bikeTime', bikeVal);
-                localStorage.setItem('bufferTime', bufVal);
-                updateApp();
-                closeSettings();
-            }
+            config.bikeTime = parseInt(document.getElementById('input-bike').value);
+            config.bufferTime = parseInt(document.getElementById('input-buffer').value);
+            config.busDuration = parseInt(document.getElementById('input-bus-duration').value);
+            config.walkHome = parseInt(document.getElementById('input-walk-home').value);
+
+            localStorage.setItem('bikeTime', config.bikeTime);
+            localStorage.setItem('bufferTime', config.bufferTime);
+            localStorage.setItem('busDuration', config.busDuration);
+            localStorage.setItem('walkHome', config.walkHome);
+
+            document.getElementById('settings-modal').style.display = 'none';
+            updateApp();
         }
 
         window.onclick = function(e) {
-            if (e.target == document.getElementById('settings-modal')) closeSettings();
+            if (e.target == document.getElementById('settings-modal')) document.getElementById('settings-modal').style.display = 'none';
         }
 
-        // START
+        // Start
         setInterval(updateApp, 1000);
         updateApp();
 
