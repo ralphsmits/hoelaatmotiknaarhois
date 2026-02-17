@@ -4,7 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mijn Pendel | Breda</title>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚌</text></svg>">
     
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448339.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
@@ -43,12 +50,17 @@
             padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
         }
-        .logo { font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
-        .settings-btn {
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        .logo { font-weight: 800; font-size: 1.1rem; }
+        
+        .header-actions { display: flex; gap: 10px; }
+
+        .icon-btn {
             background: transparent; border: 1px solid var(--border); color: var(--text-muted);
             width: 40px; height: 40px; border-radius: 10px; cursor: pointer; display: grid; place-items: center; transition: 0.2s;
         }
-        .settings-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .icon-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .icon-btn.active { background: var(--c-bus); color: white; border-color: var(--c-bus); }
 
         /* MAIN GRID */
         main {
@@ -95,11 +107,8 @@
         
         /* A. Journey Bar */
         .journey-bar { display: flex; height: 12px; width: 100%; border-radius: 6px; overflow: hidden; margin-bottom: 10px; }
-        .j-segment { height: 100%; position: relative; }
-        .j-bike { background: var(--c-bike); }
-        .j-wait { background: var(--c-wait); opacity: 0.3; }
-        .j-bus { background: var(--c-bus); }
-        .j-walk { background: var(--c-walk); }
+        .j-segment { height: 100%; position: relative; transition: width 0.5s ease, background-color 0.3s; }
+        
         .journey-legend { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); }
         .legend-item { display: flex; align-items: center; gap: 5px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; }
@@ -126,7 +135,7 @@
             padding: 14px 0; border-bottom: 1px solid var(--border); font-size: 0.95rem; align-items: center;
         }
         .timetable-row.active {
-            background: rgba(255,255,255,0.05); /* Subtiele highlight zoals in screenshot */
+            background: rgba(255,255,255,0.05);
             border-radius: 8px; padding: 14px 10px; margin: 0 -10px; border: none;
         }
         .t-big { font-weight: 700; display: block; color: var(--text-main); }
@@ -145,19 +154,26 @@
 <body>
 
     <header>
-        <div class="logo">
-            <i class="fa-solid fa-person-biking" style="color:var(--c-bike)"></i>
-            <span>Mijn Pendel</span>
+        <div class="header-left">
+            <div class="logo">
+                <i class="fa-solid fa-person-biking" style="color:var(--c-bike)" id="logo-icon"></i>
+                <span style="margin-left:8px;">Mijn Pendel</span>
+            </div>
         </div>
-        <button class="settings-btn" onclick="openSettings()">
-            <i class="fa-solid fa-sliders"></i>
-        </button>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="toggleDirection()" id="btn-toggle" title="Wissel Richting">
+                <i class="fa-solid fa-arrow-right-arrow-left"></i>
+            </button>
+            <button class="icon-btn" onclick="openSettings()">
+                <i class="fa-solid fa-sliders"></i>
+            </button>
+        </div>
     </header>
 
     <main>
         <section class="card area-hero">
             <div class="card-title">
-                <span><i class="fa-solid fa-stopwatch"></i> Vertrekadvies Tramsingel</span>
+                <span id="hero-title"><i class="fa-solid fa-stopwatch"></i> Vertrekadvies</span>
                 <span id="bus-badge" style="font-size:0.75em; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:6px;">--</span>
             </div>
             
@@ -170,16 +186,16 @@
             <div>
                 <div class="card-title" style="margin-bottom:8px;"><i class="fa-solid fa-chart-bar"></i> Jouw Reisopbouw</div>
                 <div class="journey-bar">
-                    <div class="j-segment j-bike" id="bar-bike" style="width: 25%"></div>
-                    <div class="j-segment j-wait" id="bar-wait" style="width: 5%"></div>
-                    <div class="j-segment j-bus" id="bar-bus" style="width: 55%"></div>
-                    <div class="j-segment j-walk" id="bar-walk" style="width: 15%"></div>
+                    <div class="j-segment" id="seg-1"></div>
+                    <div class="j-segment" id="seg-2"></div>
+                    <div class="j-segment" id="seg-3"></div>
+                    <div class="j-segment" id="seg-4"></div>
                 </div>
                 <div class="journey-legend">
-                    <div class="legend-item"><div class="dot j-bike"></div><span id="lbl-bike">10m</span></div>
-                    <div class="legend-item"><div class="dot j-wait"></div><span>+</span></div>
-                    <div class="legend-item"><div class="dot j-bus"></div><span id="lbl-bus">23m</span></div>
-                    <div class="legend-item"><div class="dot j-walk"></div><span id="lbl-walk">5m</span></div>
+                    <div class="legend-item"><div class="dot" id="dot-1"></div><span id="lbl-1">--</span></div>
+                    <div class="legend-item"><div class="dot" id="dot-2"></div><span>+</span></div>
+                    <div class="legend-item"><div class="dot" id="dot-3"></div><span id="lbl-3">--</span></div>
+                    <div class="legend-item"><div class="dot" id="dot-4"></div><span id="lbl-4">--</span></div>
                 </div>
             </div>
 
@@ -201,7 +217,7 @@
 
             <div class="rain-section">
                 <div class="rain-header">
-                    <span><i class="fa-solid fa-cloud-rain" style="color:var(--c-rain); margin-right:5px;"></i> Neerslag komende 2 uur</span>
+                    <span><i class="fa-solid fa-cloud-rain" style="color:var(--c-rain); margin-right:5px;"></i> Neerslag (2u)</span>
                     <span id="rain-status" style="font-size:0.75rem; color:var(--text-main);">Laden...</span>
                 </div>
                 <div class="chart-container">
@@ -233,197 +249,104 @@
             bike: parseInt(localStorage.getItem('bike')) || 10,
             buffer: parseInt(localStorage.getItem('buffer')) || 5,
             bus: parseInt(localStorage.getItem('bus')) || 23,
-            walk: parseInt(localStorage.getItem('walk')) || 5
+            walk: parseInt(localStorage.getItem('walk')) || 5,
+            direction: localStorage.getItem('direction') || 'home' // 'home' (Naar Chaam) of 'work' (Naar Breda)
         };
 
-        const DIENSTREGELING = {
+        const DIENSTREGELING_CHAAM = { // Vanaf Breda CS
             6: [25, 55], 7: [25, 55], 8: [25, 55], 9: [25, 55], 10: [25, 55],
             11: [25, 55], 12: [25, 55], 13: [25, 55], 14: [25, 55], 15: [25, 55],
             16: [25, 40, 55], 17: [10, 25, 40, 55], 18: [25, 55], 19: [25, 55],
             20: [25, 55], 21: [25], 22: [25], 23: [25]
         };
 
-        let rainChartInstance = null; // Globaal object voor de grafiek
+        const DIENSTREGELING_BREDA = { // Vanaf Meysberg (Schatting)
+            6: [20, 50], 7: [20, 50], 8: [20, 50], 9: [20, 50], 10: [20, 50],
+            11: [20, 50], 12: [20, 50], 13: [20, 50], 14: [20, 50], 15: [20, 50],
+            16: [20, 50], 17: [20, 50], 18: [20, 50], 19: [20, 50], 20: [20, 50],
+            21: [20], 22: [20]
+        };
 
-        // --- 1. DATA OPHALEN (WEER + REGEN) ---
-        async function fetchAllWeather() {
-            try {
-                // Open-Meteo: Neerslag per kwartier (minutely_15) voor een perfecte vloeiende lijn
-                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=51.58&longitude=4.77&current_weather=true&minutely_15=precipitation&forecast_days=1&timezone=Europe%2FBerlin');
-                const data = await res.json();
-                
-                // 1. Huidig Weer (Temp & Wind)
-                const temp = Math.round(data.current_weather.temperature);
-                const wind = data.current_weather.windspeed;
-                document.getElementById('w-temp').innerText = temp + "°";
-                document.getElementById('w-wind').innerText = wind;
+        let rainChartInstance = null;
 
-                // Temp Icoon aanpassen
-                const tIcon = document.getElementById('w-icon-temp');
-                if(temp < 8) tIcon.className = "fa-solid fa-snowflake";
-                else if(temp > 22) tIcon.className = "fa-solid fa-sun";
-                else tIcon.className = "fa-solid fa-cloud";
-
-                // 2. Chart.js Grafiek Tekenen
-                drawChart(data.minutely_15);
-
-            } catch (e) {
-                console.log("Weer error", e);
-                document.getElementById('rain-status').innerText = "Weer onbeschikbaar";
-            }
+        // --- TOGGLE FUNCTIE ---
+        function toggleDirection() {
+            config.direction = (config.direction === 'home') ? 'work' : 'home';
+            localStorage.setItem('direction', config.direction);
+            updateVisuals();
+            updateApp();
         }
 
-        // Functie om de Buienalarm Chart.js te tekenen
-        function drawChart(rainData) {
-            const now = new Date();
-            const currentHour = now.getHours();
-            const currentMin = now.getMinutes();
-            
-            // Vind het huidige kwartier in de data
-            let startIndex = 0;
-            for(let i=0; i < rainData.time.length; i++) {
-                const wTime = new Date(rainData.time[i]);
-                if (wTime.getHours() === currentHour && wTime.getMinutes() >= currentMin - 15) {
-                    startIndex = i;
-                    break;
-                }
-            }
-
-            let labels = [];
-            let dataPoints = [];
-            let totalRain = 0;
-
-            // Haal de komende 9 datapunten op (ongeveer 2 uur vooruit)
-            for (let i = 0; i < 9; i++) {
-                const idx = startIndex + i;
-                if (idx >= rainData.precipitation.length) break;
-
-                const amount = rainData.precipitation[idx]; // mm neerslag
-                const timeObj = new Date(rainData.time[idx]);
-                const timeStr = timeObj.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
-                
-                labels.push(timeStr);
-                dataPoints.push(amount);
-                totalRain += amount;
-            }
-
-            // Update status text
-            const statusText = document.getElementById('rain-status');
-            if (totalRain === 0) {
-                statusText.innerText = "Droog";
-                statusText.style.color = "var(--text-muted)";
-            } else {
-                statusText.innerText = "Regen verwacht";
-                statusText.style.color = "var(--c-rain)";
-            }
-
-            // Als er al een grafiek is, verwijder deze eerst
-            if (rainChartInstance) {
-                rainChartInstance.destroy();
-            }
-
-            const ctx = document.getElementById('rainChart').getContext('2d');
-            
-            // Maak de gradiënt voor de onderkant van de lijn (Buienalarm effect)
-            let gradient = ctx.createLinearGradient(0, 0, 0, 120);
-            gradient.addColorStop(0, 'rgba(96, 165, 250, 0.4)'); // Blauw transparant bovenaan
-            gradient.addColorStop(1, 'rgba(96, 165, 250, 0.0)'); // Volledig transparant onderaan
-
-            rainChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Neerslag (mm)',
-                        data: dataPoints,
-                        borderColor: '#60a5fa', // Buienalarm blauw
-                        backgroundColor: gradient,
-                        borderWidth: 2,
-                        fill: true, // Zorgt voor het gekleurde vlak eronder
-                        tension: 0.4, // Zorgt voor de vloeiende Buienalarm rondingen
-                        pointRadius: 0, // Verberg de bolletjes
-                        pointHoverRadius: 5 // Toon bolletje alleen als je eroverheen gaat
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            backgroundColor: 'rgba(30, 41, 59, 0.9)',
-                            titleColor: '#f1f5f9',
-                            bodyColor: '#60a5fa'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            suggestedMax: 1.5, // Zorg dat de Y-as altijd wat ruimte heeft
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.05)', // Subtiele stippellijntjes
-                                drawBorder: false,
-                            },
-                            ticks: {
-                                color: '#64748b',
-                                font: { size: 10 },
-                                stepSize: 0.5,
-                                callback: function(value) {
-                                    return value > 0 ? value + 'mm' : ''; // Verberg de 0
-                                }
-                            }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: {
-                                color: '#64748b',
-                                font: { size: 10 },
-                                maxTicksLimit: 5 // Laat niet elke tijd zien, anders wordt het te druk
-                            }
-                        }
-                    },
-                    interaction: {
-                        mode: 'nearest',
-                        axis: 'x',
-                        intersect: false
-                    }
-                }
-            });
-        }
-
-        // --- 2. APP LOGICA ---
+        // --- UPDATE VISUALS ---
         function updateVisuals() {
             const total = config.bike + config.buffer + config.bus + config.walk;
-            document.getElementById('bar-bike').style.width = (config.bike / total * 100) + "%";
-            document.getElementById('bar-wait').style.width = (config.buffer / total * 100) + "%";
-            document.getElementById('bar-bus').style.width = (config.bus / total * 100) + "%";
-            document.getElementById('bar-walk').style.width = (config.walk / total * 100) + "%";
-            
-            document.getElementById('lbl-bike').innerText = config.bike + "m";
-            document.getElementById('lbl-bus').innerText = config.bus + "m";
-            document.getElementById('lbl-walk').innerText = config.walk + "m";
+            const pBike = (config.bike / total * 100) + "%";
+            const pWait = (config.buffer / total * 100) + "%";
+            const pBus = (config.bus / total * 100) + "%";
+            const pWalk = (config.walk / total * 100) + "%";
+
+            const elements = ['seg-1', 'seg-2', 'seg-3', 'seg-4', 'dot-1', 'dot-2', 'dot-3', 'dot-4', 'lbl-1', 'lbl-3', 'lbl-4', 'btn-toggle', 'hero-title'];
+            const ui = {}; elements.forEach(id => ui[id] = document.getElementById(id));
+
+            if (config.direction === 'home') {
+                ui['btn-toggle'].classList.remove('active');
+                ui['hero-title'].innerHTML = '<i class="fa-solid fa-stopwatch"></i> Vertrek Tramsingel';
+                
+                ui['seg-1'].style.width = pBike; ui['seg-1'].style.backgroundColor = 'var(--c-bike)';
+                ui['seg-2'].style.width = pWait; ui['seg-2'].style.backgroundColor = 'var(--c-wait)';
+                ui['seg-3'].style.width = pBus;  ui['seg-3'].style.backgroundColor = 'var(--c-bus)';
+                ui['seg-4'].style.width = pWalk; ui['seg-4'].style.backgroundColor = 'var(--c-walk)';
+
+                ui['dot-1'].style.backgroundColor = 'var(--c-bike)';
+                ui['dot-2'].style.backgroundColor = 'var(--c-wait)';
+                ui['dot-3'].style.backgroundColor = 'var(--c-bus)';
+                ui['dot-4'].style.backgroundColor = 'var(--c-walk)';
+
+                ui['lbl-1'].innerText = config.bike + "m (Fiets)";
+                ui['lbl-3'].innerText = config.bus + "m";
+                ui['lbl-4'].innerText = config.walk + "m (Thuis)";
+            } else {
+                ui['btn-toggle'].classList.add('active');
+                ui['hero-title'].innerHTML = '<i class="fa-solid fa-person-walking"></i> Vertrek Alphensebaan';
+
+                ui['seg-1'].style.width = pWalk; ui['seg-1'].style.backgroundColor = 'var(--c-walk)';
+                ui['seg-2'].style.width = pWait; ui['seg-2'].style.backgroundColor = 'var(--c-wait)';
+                ui['seg-3'].style.width = pBus;  ui['seg-3'].style.backgroundColor = 'var(--c-bus)';
+                ui['seg-4'].style.width = pBike; ui['seg-4'].style.backgroundColor = 'var(--c-bike)';
+
+                ui['dot-1'].style.backgroundColor = 'var(--c-walk)';
+                ui['dot-2'].style.backgroundColor = 'var(--c-wait)';
+                ui['dot-3'].style.backgroundColor = 'var(--c-bus)';
+                ui['dot-4'].style.backgroundColor = 'var(--c-bike)';
+
+                ui['lbl-1'].innerText = config.walk + "m (Loop)";
+                ui['lbl-3'].innerText = config.bus + "m";
+                ui['lbl-4'].innerText = config.bike + "m (Werk)";
+            }
         }
 
+        // --- APP LOGICA ---
         function updateApp() {
             const nu = new Date();
             const list = document.getElementById('timetable-list');
             list.innerHTML = "";
             let nextOption = null;
-            let totalDelay = config.bike + config.buffer;
+
+            const schema = (config.direction === 'home') ? DIENSTREGELING_CHAAM : DIENSTREGELING_BREDA;
+            const firstLeg = (config.direction === 'home') ? config.bike : config.walk;
+            const lastLeg = (config.direction === 'home') ? config.walk : config.bike;
+            const totalDelay = firstLeg + config.buffer;
 
             for (let uur = 0; uur < 24; uur++) {
-                if (DIENSTREGELING[uur]) {
-                    for (let minuut of DIENSTREGELING[uur]) {
-                        
+                if (schema[uur]) {
+                    for (let minuut of schema[uur]) {
                         let busDate = new Date(nu); busDate.setHours(uur, minuut, 0);
                         let vertrekDate = new Date(busDate.getTime() - (totalDelay * 60000));
-                        let thuisDate = new Date(busDate.getTime() + ((config.bus + config.walk) * 60000));
+                        let aankomstDate = new Date(busDate.getTime() + ((config.bus + lastLeg) * 60000));
 
                         let vStr = vertrekDate.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
                         let bStr = busDate.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
-                        let tStr = thuisDate.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
+                        let aStr = aankomstDate.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
 
                         let div = document.createElement('div');
                         div.className = "timetable-row";
@@ -432,18 +355,20 @@
                             div.classList.add('past'); 
                         } else {
                             if (!nextOption) {
-                                nextOption = { vertrek: vertrekDate, bus: bStr, thuis: tStr };
-                                div.classList.add('active'); // Highlight
+                                nextOption = { vertrek: vertrekDate, bus: bStr, aankomst: aStr };
+                                div.classList.add('active');
                             }
                         }
 
                         if (vertrekDate > new Date(nu.getTime() - 3600000)) {
+                            const startTxt = (config.direction === 'home') ? 'Fietsen' : 'Lopen';
+                            const endTxt = (config.direction === 'home') ? 'Thuis' : 'Tramsingel';
                             div.innerHTML = `
-                                <div><span class="t-big">${vStr}</span><span class="t-small">Fietsen</span></div>
+                                <div><span class="t-big">${vStr}</span><span class="t-small">${startTxt}</span></div>
                                 <div style="text-align:center; font-size:0.8em; color:var(--text-muted)">
                                     <i class="fa-solid fa-arrow-right"></i><br>Bus ${bStr}
                                 </div>
-                                <div style="text-align:right"><span class="t-big">${tStr}</span><span class="t-small">Thuis</span></div>
+                                <div style="text-align:right"><span class="t-big">${aStr}</span><span class="t-small">${endTxt}</span></div>
                             `;
                             list.appendChild(div);
                         }
@@ -451,15 +376,12 @@
                 }
             }
 
-            // Grote klok updaten
             if (nextOption) {
                 document.getElementById('leave-time').innerText = nextOption.vertrek.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
                 document.getElementById('bus-badge').innerText = `Bus ${nextOption.bus}`;
-                
                 const diff = Math.floor((nextOption.vertrek - nu) / 1000);
                 const min = Math.floor(diff / 60);
                 const sec = diff % 60;
-                
                 const sub = document.getElementById('countdown-text');
                 const main = document.getElementById('leave-time');
 
@@ -469,24 +391,79 @@
                     main.style.color = "var(--text-main)";
                 } else {
                     sub.innerText = `Vertrek over ${min} min ${sec} sec`;
-                    if (min < 5) {
-                        main.style.color = "var(--accent-red)";
-                        sub.className = "sub-text critical";
-                    } else if (min < 15) {
-                        main.style.color = "var(--accent-orange)";
-                        sub.className = "sub-text urgent";
-                    } else {
-                        main.style.color = "var(--accent-red)"; // Net als in je screenshot
-                        sub.className = "sub-text";
-                    }
+                    if (min < 5) { main.style.color = "var(--accent-red)"; sub.className = "sub-text critical"; }
+                    else if (min < 15) { main.style.color = "var(--accent-orange)"; sub.className = "sub-text urgent"; }
+                    else { main.style.color = "var(--accent-red)"; sub.className = "sub-text"; }
                 }
             } else {
                 document.getElementById('leave-time').innerText = "--:--";
-                document.getElementById('countdown-text').innerText = "Geen bussen meer vandaag";
+                document.getElementById('countdown-text').innerText = "Geen bussen meer";
             }
         }
 
-        // Instellingen Modal Handlers
+        // --- WEER ---
+        async function fetchAllWeather() {
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=51.58&longitude=4.77&current_weather=true&minutely_15=precipitation&forecast_days=1&timezone=Europe%2FBerlin');
+                const data = await res.json();
+                const temp = Math.round(data.current_weather.temperature);
+                const wind = data.current_weather.windspeed;
+                document.getElementById('w-temp').innerText = temp + "°";
+                document.getElementById('w-wind').innerText = wind;
+                const tIcon = document.getElementById('w-icon-temp');
+                if(temp < 8) tIcon.className = "fa-solid fa-snowflake";
+                else if(temp > 22) tIcon.className = "fa-solid fa-sun";
+                else tIcon.className = "fa-solid fa-cloud";
+                drawChart(data.minutely_15);
+            } catch (e) {
+                document.getElementById('rain-status').innerText = "Offline";
+            }
+        }
+
+        function drawChart(rainData) {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMin = now.getMinutes();
+            let startIndex = 0;
+            for(let i=0; i < rainData.time.length; i++) {
+                const wTime = new Date(rainData.time[i]);
+                if (wTime.getHours() === currentHour && wTime.getMinutes() >= currentMin - 15) { startIndex = i; break; }
+            }
+            let labels = []; let dataPoints = []; let totalRain = 0;
+            for (let i = 0; i < 9; i++) {
+                const idx = startIndex + i;
+                if (idx >= rainData.precipitation.length) break;
+                const amount = rainData.precipitation[idx];
+                labels.push(new Date(rainData.time[idx]).toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'}));
+                dataPoints.push(amount); totalRain += amount;
+            }
+            const statusText = document.getElementById('rain-status');
+            if (totalRain === 0) { statusText.innerText = "Droog"; statusText.style.color = "var(--text-muted)"; }
+            else { statusText.innerText = "Regen verwacht"; statusText.style.color = "var(--c-rain)"; }
+
+            if (rainChartInstance) rainChartInstance.destroy();
+            const ctx = document.getElementById('rainChart').getContext('2d');
+            let gradient = ctx.createLinearGradient(0, 0, 0, 120);
+            gradient.addColorStop(0, 'rgba(96, 165, 250, 0.4)');
+            gradient.addColorStop(1, 'rgba(96, 165, 250, 0.0)');
+
+            rainChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{ label: 'mm', data: dataPoints, borderColor: '#60a5fa', backgroundColor: gradient, borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, suggestedMax: 1, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: {size:10} } },
+                        x: { grid: { display: false }, ticks: { color: '#64748b', font: {size:10} } }
+                    }
+                }
+            });
+        }
+
         function openSettings() {
             document.getElementById('inp-bike').value = config.bike;
             document.getElementById('inp-buffer').value = config.buffer;
@@ -494,29 +471,21 @@
             document.getElementById('inp-walk').value = config.walk;
             document.getElementById('settings-modal').style.display = 'flex';
         }
-
         function saveSettings() {
             config.bike = parseInt(document.getElementById('inp-bike').value);
             config.buffer = parseInt(document.getElementById('inp-buffer').value);
             config.bus = parseInt(document.getElementById('inp-bus').value);
             config.walk = parseInt(document.getElementById('inp-walk').value);
-            localStorage.setItem('bike', config.bike);
-            localStorage.setItem('buffer', config.buffer);
-            localStorage.setItem('bus', config.bus);
-            localStorage.setItem('walk', config.walk);
+            localStorage.setItem('bike', config.bike); localStorage.setItem('buffer', config.buffer);
+            localStorage.setItem('bus', config.bus); localStorage.setItem('walk', config.walk);
             document.getElementById('settings-modal').style.display = 'none';
-            updateVisuals();
-            updateApp();
+            updateVisuals(); updateApp();
         }
-        window.onclick = function(e) { if(e.target == document.getElementById('settings-modal')) document.getElementById('settings-modal').style.display='none'; }
+        window.onclick = (e) => { if(e.target == document.getElementById('settings-modal')) document.getElementById('settings-modal').style.display='none'; }
 
-        // Start applicatie
-        updateVisuals();
-        updateApp();
-        fetchAllWeather();
-        setInterval(updateApp, 1000); // Klok elke seconde
-        setInterval(fetchAllWeather, 300000); // Weer elke 5 minuten
-
+        updateVisuals(); updateApp(); fetchAllWeather();
+        setInterval(updateApp, 1000);
+        setInterval(fetchAllWeather, 300000);
     </script>
 </body>
 </html>
