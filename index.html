@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
             --bg-body: #0f172a;
@@ -16,12 +18,11 @@
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
             
-            /* Kleuren */
             --c-bike: #10b981;
             --c-wait: #64748b;
             --c-bus: #3b82f6;
             --c-walk: #a855f7;
-            --c-rain: #60a5fa;
+            --c-rain: #60a5fa; /* Buienalarm Blauw */
             
             --accent-red: #ef4444;
             --accent-orange: #f59e0b;
@@ -60,7 +61,7 @@
         @media (min-width: 900px) {
             main {
                 padding: 2rem;
-                grid-template-columns: 1.2fr 1fr; /* Links iets breder */
+                grid-template-columns: 1.2fr 1fr;
                 grid-template-areas: 
                     "hero hero"
                     "info list";
@@ -81,7 +82,7 @@
         /* 1. HERO (COUNTDOWN) */
         .area-hero { grid-area: hero; background: linear-gradient(145deg, #1e293b, #161f2d); }
         .big-time {
-            font-size: clamp(3.5rem, 8vw, 6rem); font-weight: 800; color: var(--text-main);
+            font-size: clamp(3.5rem, 8vw, 6rem); font-weight: 800; color: var(--accent-red);
             line-height: 1; text-align: center; letter-spacing: -2px; font-variant-numeric: tabular-nums;
         }
         .sub-text { text-align: center; color: var(--text-muted); margin-top: 5px; font-size: 1.1rem;}
@@ -93,9 +94,7 @@
         .area-info { grid-area: info; gap: 20px; }
         
         /* A. Journey Bar */
-        .journey-bar {
-            display: flex; height: 12px; width: 100%; border-radius: 6px; overflow: hidden; margin-bottom: 10px;
-        }
+        .journey-bar { display: flex; height: 12px; width: 100%; border-radius: 6px; overflow: hidden; margin-bottom: 10px; }
         .j-segment { height: 100%; position: relative; }
         .j-bike { background: var(--c-bike); }
         .j-wait { background: var(--c-wait); opacity: 0.3; }
@@ -105,7 +104,7 @@
         .legend-item { display: flex; align-items: center; gap: 5px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; }
 
-        /* B. Weather Boxes */
+        /* B. Weather Grid */
         .weather-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .weather-box {
             background: rgba(255,255,255,0.03); border-radius: 12px; padding: 15px;
@@ -114,30 +113,10 @@
         .w-val { font-size: 1.4rem; font-weight: bold; margin: 5px 0; }
         .w-label { font-size: 0.75rem; color: var(--text-muted); }
 
-        /* C. Rain Graph */
+        /* C. Rain Graph (Chart.js Container) */
         .rain-section { margin-top: 10px; flex: 1; display: flex; flex-direction: column; justify-content: flex-end;}
-        .rain-header { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        .graph-wrapper {
-            display: flex; align-items: flex-end; justify-content: space-between;
-            height: 80px; width: 100%;
-            border-bottom: 1px solid var(--border);
-            position: relative;
-        }
-        .graph-grid-line {
-            position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(255,255,255,0.05); pointer-events: none;
-        }
-        .grid-light { bottom: 33%; } .grid-heavy { bottom: 66%; }
-        
-        .rain-bar-group {
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-            flex: 1; height: 100%; margin: 0 1px;
-        }
-        .rain-bar {
-            width: 100%; background: var(--c-rain); border-radius: 2px 2px 0 0;
-            transition: height 0.5s ease; min-height: 2px; opacity: 0.9;
-        }
-        .rain-bar.dry { background: rgba(255,255,255,0.05); }
-        .rain-time { font-size: 0.6rem; color: var(--text-muted); margin-top: 4px; opacity: 0.7; }
+        .rain-header { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .chart-container { position: relative; height: 120px; width: 100%; }
 
         /* 3. LIST CARD (Right Bottom) */
         .area-list { grid-area: list; max-height: 100%; overflow: hidden; }
@@ -147,7 +126,7 @@
             padding: 14px 0; border-bottom: 1px solid var(--border); font-size: 0.95rem; align-items: center;
         }
         .timetable-row.active {
-            background: linear-gradient(90deg, rgba(16,185,129,0.05), rgba(59,130,246,0.05));
+            background: rgba(255,255,255,0.05); /* Subtiele highlight zoals in screenshot */
             border-radius: 8px; padding: 14px 10px; margin: 0 -10px; border: none;
         }
         .t-big { font-weight: 700; display: block; color: var(--text-main); }
@@ -159,7 +138,7 @@
         .input-group { margin-bottom: 1rem; }
         .input-group label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem;}
         .input-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: #fff; font-size: 1rem; }
-        .save-btn { width: 100%; padding: 12px; background: var(--c-bike); border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .save-btn { width: 100%; padding: 12px; background: var(--c-bike); border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; color: #000; }
 
     </style>
 </head>
@@ -187,8 +166,9 @@
         </section>
 
         <section class="card area-info">
+            
             <div>
-                <div class="card-title" style="margin-bottom:8px;"><i class="fa-solid fa-route"></i> Jouw Reisopbouw</div>
+                <div class="card-title" style="margin-bottom:8px;"><i class="fa-solid fa-chart-bar"></i> Jouw Reisopbouw</div>
                 <div class="journey-bar">
                     <div class="j-segment j-bike" id="bar-bike" style="width: 25%"></div>
                     <div class="j-segment j-wait" id="bar-wait" style="width: 5%"></div>
@@ -203,28 +183,30 @@
                 </div>
             </div>
 
-            <div class="weather-grid">
-                <div class="weather-box">
-                    <i class="fa-solid fa-temperature-half" style="color:#fff; margin-bottom:5px;"></i>
-                    <span class="w-val" id="w-temp">--°</span>
-                    <span class="w-label">Temperatuur</span>
-                </div>
-                <div class="weather-box">
-                    <i class="fa-solid fa-wind" style="color:#fff; margin-bottom:5px;"></i>
-                    <span class="w-val" id="w-wind">--</span>
-                    <span class="w-label">Wind (km/h)</span>
+            <div>
+                <div class="card-title" style="margin-top:10px;"><i class="fa-solid fa-cloud-sun"></i> Weer in Breda</div>
+                <div class="weather-grid">
+                    <div class="weather-box">
+                        <i class="fa-solid fa-snowflake" style="color:#fff; margin-bottom:5px; font-size:1.2rem;" id="w-icon-temp"></i>
+                        <span class="w-val" id="w-temp">--°</span>
+                        <span class="w-label">Temperatuur</span>
+                    </div>
+                    <div class="weather-box">
+                        <i class="fa-solid fa-wind" style="color:#fff; margin-bottom:5px; font-size:1.2rem;"></i>
+                        <span class="w-val" id="w-wind">--</span>
+                        <span class="w-label">Wind (km/h)</span>
+                    </div>
                 </div>
             </div>
 
             <div class="rain-section">
                 <div class="rain-header">
-                    <i class="fa-solid fa-cloud-rain" style="color:var(--c-rain)"></i>
-                    <span id="rain-text">Buienradar laden...</span>
+                    <span><i class="fa-solid fa-cloud-rain" style="color:var(--c-rain); margin-right:5px;"></i> Neerslag komende 2 uur</span>
+                    <span id="rain-status" style="font-size:0.75rem; color:var(--text-main);">Laden...</span>
                 </div>
-                <div class="graph-wrapper" id="rain-graph">
-                    <div class="graph-grid-line grid-light"></div>
-                    <div class="graph-grid-line grid-heavy"></div>
-                    </div>
+                <div class="chart-container">
+                    <canvas id="rainChart"></canvas>
+                </div>
             </div>
         </section>
 
@@ -261,39 +243,43 @@
             20: [25, 55], 21: [25], 22: [25], 23: [25]
         };
 
+        let rainChartInstance = null; // Globaal object voor de grafiek
+
         // --- 1. DATA OPHALEN (WEER + REGEN) ---
         async function fetchAllWeather() {
             try {
-                // Eén API call voor alles (Breda)
+                // Open-Meteo: Neerslag per kwartier (minutely_15) voor een perfecte vloeiende lijn
                 const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=51.58&longitude=4.77&current_weather=true&minutely_15=precipitation&forecast_days=1&timezone=Europe%2FBerlin');
                 const data = await res.json();
                 
-                // 1. Huidig Weer
+                // 1. Huidig Weer (Temp & Wind)
                 const temp = Math.round(data.current_weather.temperature);
                 const wind = data.current_weather.windspeed;
                 document.getElementById('w-temp').innerText = temp + "°";
                 document.getElementById('w-wind').innerText = wind;
 
-                // 2. Regen Grafiek
-                drawGraph(data.minutely_15);
+                // Temp Icoon aanpassen
+                const tIcon = document.getElementById('w-icon-temp');
+                if(temp < 8) tIcon.className = "fa-solid fa-snowflake";
+                else if(temp > 22) tIcon.className = "fa-solid fa-sun";
+                else tIcon.className = "fa-solid fa-cloud";
+
+                // 2. Chart.js Grafiek Tekenen
+                drawChart(data.minutely_15);
 
             } catch (e) {
                 console.log("Weer error", e);
-                document.getElementById('rain-text').innerText = "Weer onbeschikbaar";
+                document.getElementById('rain-status').innerText = "Weer onbeschikbaar";
             }
         }
 
-        function drawGraph(rainData) {
-            const container = document.getElementById('rain-graph');
-            // Verwijder oude bars, behoud grid
-            const oldBars = container.querySelectorAll('.rain-bar-group');
-            oldBars.forEach(b => b.remove());
-
+        // Functie om de Buienalarm Chart.js te tekenen
+        function drawChart(rainData) {
             const now = new Date();
             const currentHour = now.getHours();
             const currentMin = now.getMinutes();
             
-            // Vind startpunt (huidige kwartier)
+            // Vind het huidige kwartier in de data
             let startIndex = 0;
             for(let i=0; i < rainData.time.length; i++) {
                 const wTime = new Date(rainData.time[i]);
@@ -303,56 +289,108 @@
                 }
             }
 
+            let labels = [];
+            let dataPoints = [];
             let totalRain = 0;
-            // Toon komende 8 blokken (2 uur)
-            for (let i = 0; i < 8; i++) {
+
+            // Haal de komende 9 datapunten op (ongeveer 2 uur vooruit)
+            for (let i = 0; i < 9; i++) {
                 const idx = startIndex + i;
                 if (idx >= rainData.precipitation.length) break;
 
-                const amount = rainData.precipitation[idx];
+                const amount = rainData.precipitation[idx]; // mm neerslag
                 const timeObj = new Date(rainData.time[idx]);
                 const timeStr = timeObj.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
                 
+                labels.push(timeStr);
+                dataPoints.push(amount);
                 totalRain += amount;
-
-                // Bar hoogte (max 3mm = 100%)
-                let h = 0;
-                let isDry = true;
-                if (amount > 0) {
-                    isDry = false;
-                    h = (amount / 2.5) * 100;
-                    if (h > 100) h = 100;
-                    if (h < 5) h = 5;
-                } else {
-                    h = 2; // Minimaal
-                }
-
-                const grp = document.createElement('div');
-                grp.className = 'rain-bar-group';
-                
-                const bar = document.createElement('div');
-                bar.className = isDry ? 'rain-bar dry' : 'rain-bar';
-                bar.style.height = h + '%';
-                
-                const lbl = document.createElement('div');
-                lbl.className = 'rain-time';
-                // Toon tijd om en om
-                lbl.innerText = (i % 2 === 0) ? timeStr : '';
-
-                grp.appendChild(bar);
-                grp.appendChild(lbl);
-                container.appendChild(grp);
             }
 
-            // Tekst update
-            const txt = document.getElementById('rain-text');
+            // Update status text
+            const statusText = document.getElementById('rain-status');
             if (totalRain === 0) {
-                txt.innerText = "Komende 2 uur droog";
-                txt.style.color = "#10b981";
+                statusText.innerText = "Droog";
+                statusText.style.color = "var(--text-muted)";
             } else {
-                txt.innerText = `Neerslag verwacht (${totalRain.toFixed(1)} mm)`;
-                txt.style.color = "#60a5fa";
+                statusText.innerText = "Regen verwacht";
+                statusText.style.color = "var(--c-rain)";
             }
+
+            // Als er al een grafiek is, verwijder deze eerst
+            if (rainChartInstance) {
+                rainChartInstance.destroy();
+            }
+
+            const ctx = document.getElementById('rainChart').getContext('2d');
+            
+            // Maak de gradiënt voor de onderkant van de lijn (Buienalarm effect)
+            let gradient = ctx.createLinearGradient(0, 0, 0, 120);
+            gradient.addColorStop(0, 'rgba(96, 165, 250, 0.4)'); // Blauw transparant bovenaan
+            gradient.addColorStop(1, 'rgba(96, 165, 250, 0.0)'); // Volledig transparant onderaan
+
+            rainChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Neerslag (mm)',
+                        data: dataPoints,
+                        borderColor: '#60a5fa', // Buienalarm blauw
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        fill: true, // Zorgt voor het gekleurde vlak eronder
+                        tension: 0.4, // Zorgt voor de vloeiende Buienalarm rondingen
+                        pointRadius: 0, // Verberg de bolletjes
+                        pointHoverRadius: 5 // Toon bolletje alleen als je eroverheen gaat
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#60a5fa'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            suggestedMax: 1.5, // Zorg dat de Y-as altijd wat ruimte heeft
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)', // Subtiele stippellijntjes
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                color: '#64748b',
+                                font: { size: 10 },
+                                stepSize: 0.5,
+                                callback: function(value) {
+                                    return value > 0 ? value + 'mm' : ''; // Verberg de 0
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                color: '#64748b',
+                                font: { size: 10 },
+                                maxTicksLimit: 5 // Laat niet elke tijd zien, anders wordt het te druk
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
         }
 
         // --- 2. APP LOGICA ---
@@ -395,7 +433,7 @@
                         } else {
                             if (!nextOption) {
                                 nextOption = { vertrek: vertrekDate, bus: bStr, thuis: tStr };
-                                div.classList.add('active');
+                                div.classList.add('active'); // Highlight
                             }
                         }
 
@@ -413,6 +451,7 @@
                 }
             }
 
+            // Grote klok updaten
             if (nextOption) {
                 document.getElementById('leave-time').innerText = nextOption.vertrek.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
                 document.getElementById('bus-badge').innerText = `Bus ${nextOption.bus}`;
@@ -437,16 +476,17 @@
                         main.style.color = "var(--accent-orange)";
                         sub.className = "sub-text urgent";
                     } else {
-                        main.style.color = "var(--c-bike)";
+                        main.style.color = "var(--accent-red)"; // Net als in je screenshot
                         sub.className = "sub-text";
                     }
                 }
             } else {
                 document.getElementById('leave-time').innerText = "--:--";
-                document.getElementById('countdown-text').innerText = "Geen bussen meer";
+                document.getElementById('countdown-text').innerText = "Geen bussen meer vandaag";
             }
         }
 
+        // Instellingen Modal Handlers
         function openSettings() {
             document.getElementById('inp-bike').value = config.bike;
             document.getElementById('inp-buffer').value = config.buffer;
@@ -470,12 +510,12 @@
         }
         window.onclick = function(e) { if(e.target == document.getElementById('settings-modal')) document.getElementById('settings-modal').style.display='none'; }
 
-        // Start
+        // Start applicatie
         updateVisuals();
         updateApp();
         fetchAllWeather();
-        setInterval(updateApp, 1000);
-        setInterval(fetchAllWeather, 300000);
+        setInterval(updateApp, 1000); // Klok elke seconde
+        setInterval(fetchAllWeather, 300000); // Weer elke 5 minuten
 
     </script>
 </body>
