@@ -6,7 +6,6 @@
     <title>Mijn Pendel | Breda</title>
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚌</text></svg>">
-    
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3448/3448339.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,7 +13,6 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -29,7 +27,9 @@
             --c-wait: #64748b;
             --c-bus: #3b82f6;
             --c-walk: #a855f7;
-            --c-rain: #60a5fa; /* Buienalarm Blauw */
+            --c-rain: #60a5fa; 
+            --c-ns: #ffc917;
+            --c-ns-text: #003082;
             
             --accent-red: #ef4444;
             --accent-orange: #f59e0b;
@@ -52,7 +52,6 @@
         }
         .header-left { display: flex; align-items: center; gap: 10px; }
         .logo { font-weight: 800; font-size: 1.1rem; }
-        
         .header-actions { display: flex; gap: 10px; }
 
         .icon-btn {
@@ -62,21 +61,18 @@
         .icon-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
         .icon-btn.active { background: var(--c-bus); color: white; border-color: var(--c-bus); }
 
-        /* MAIN GRID */
+        /* GRID */
         main {
             flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; padding: 1rem;
             display: grid; gap: 1rem;
             grid-template-columns: 1fr;
-            grid-template-areas: "hero" "info" "list";
+            grid-template-areas: "hero" "ns" "info" "list";
         }
-
         @media (min-width: 900px) {
             main {
                 padding: 2rem;
                 grid-template-columns: 1.2fr 1fr;
-                grid-template-areas: 
-                    "hero hero"
-                    "info list";
+                grid-template-areas: "hero ns" "info list";
             }
         }
 
@@ -91,7 +87,7 @@
             margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between;
         }
 
-        /* 1. HERO (COUNTDOWN) */
+        /* HERO */
         .area-hero { grid-area: hero; background: linear-gradient(145deg, #1e293b, #161f2d); }
         .big-time {
             font-size: clamp(3.5rem, 8vw, 6rem); font-weight: 800; color: var(--accent-red);
@@ -100,44 +96,36 @@
         .sub-text { text-align: center; color: var(--text-muted); margin-top: 5px; font-size: 1.1rem;}
         .sub-text.urgent { color: var(--accent-orange); }
         .sub-text.critical { color: var(--accent-red); font-weight: bold; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-
-        /* 2. INFO CARD (Left Bottom) */
-        .area-info { grid-area: info; gap: 20px; }
         
-        /* A. Journey Bar */
+        /* NS */
+        .area-ns { grid-area: ns; min-height: 180px; }
+        .ns-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; align-items: center;}
+        .ns-time { font-weight: 700; color: var(--c-ns); width: 50px; font-variant-numeric: tabular-nums; }
+        .ns-dest { flex: 1; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 10px; }
+        .ns-track { background: var(--c-ns-text); color: var(--c-ns); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        
+        /* INFO */
+        .area-info { grid-area: info; gap: 20px; }
         .journey-bar { display: flex; height: 12px; width: 100%; border-radius: 6px; overflow: hidden; margin-bottom: 10px; }
         .j-segment { height: 100%; position: relative; transition: width 0.5s ease, background-color 0.3s; }
-        
         .journey-legend { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); }
         .legend-item { display: flex; align-items: center; gap: 5px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; }
 
-        /* B. Weather Grid */
         .weather-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .weather-box {
-            background: rgba(255,255,255,0.03); border-radius: 12px; padding: 15px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
+        .weather-box { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .w-val { font-size: 1.4rem; font-weight: bold; margin: 5px 0; }
         .w-label { font-size: 0.75rem; color: var(--text-muted); }
 
-        /* C. Rain Graph (Chart.js Container) */
         .rain-section { margin-top: 10px; flex: 1; display: flex; flex-direction: column; justify-content: flex-end;}
         .rain-header { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         .chart-container { position: relative; height: 120px; width: 100%; }
 
-        /* 3. LIST CARD (Right Bottom) */
+        /* LIST */
         .area-list { grid-area: list; max-height: 100%; overflow: hidden; }
         .list-container { max-height: 500px; overflow-y: auto; scrollbar-width: thin; }
-        .timetable-row {
-            display: grid; grid-template-columns: 1fr auto 1fr; 
-            padding: 14px 0; border-bottom: 1px solid var(--border); font-size: 0.95rem; align-items: center;
-        }
-        .timetable-row.active {
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px; padding: 14px 10px; margin: 0 -10px; border: none;
-        }
+        .timetable-row { display: grid; grid-template-columns: 1fr auto 1fr; padding: 14px 0; border-bottom: 1px solid var(--border); font-size: 0.95rem; align-items: center; }
+        .timetable-row.active { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 14px 10px; margin: 0 -10px; border: none; }
         .t-big { font-weight: 700; display: block; color: var(--text-main); }
         .t-small { font-size: 0.75rem; color: var(--text-muted); }
 
@@ -148,7 +136,8 @@
         .input-group label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem;}
         .input-group input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: #fff; font-size: 1rem; }
         .save-btn { width: 100%; padding: 12px; background: var(--c-bike); border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; color: #000; }
-
+        .suggestion-box { max-height: 100px; overflow-y: auto; background: var(--bg-body); position: absolute; width: 100%; z-index: 10; border: 1px solid var(--border); display:none;}
+        .suggestion-item { padding: 8px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -176,13 +165,22 @@
                 <span id="hero-title"><i class="fa-solid fa-stopwatch"></i> Vertrekadvies</span>
                 <span id="bus-badge" style="font-size:0.75em; background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:6px;">--</span>
             </div>
-            
             <div class="big-time" id="leave-time">--:--</div>
-            <div class="sub-text" id="countdown-text">Route berekenen...</div>
+            <div class="sub-text" id="countdown-text">Initialiseren...</div>
+        </section>
+
+        <section class="card area-ns">
+            <div class="card-title">
+                <span><i class="fa-solid fa-train" style="color:var(--c-ns); margin-right:5px;"></i> Live NS <span id="station-name">Breda</span></span>
+                <span style="font-size:0.7rem; color:var(--text-muted)" id="ns-status"></span>
+            </div>
+            <div id="ns-disruptions"></div>
+            <div id="ns-departures">
+                <div style="text-align:center; padding:20px; color:var(--text-muted)">Geen NS Key ingesteld</div>
+            </div>
         </section>
 
         <section class="card area-info">
-            
             <div>
                 <div class="card-title" style="margin-bottom:8px;"><i class="fa-solid fa-chart-bar"></i> Jouw Reisopbouw</div>
                 <div class="journey-bar">
@@ -200,17 +198,15 @@
             </div>
 
             <div>
-                <div class="card-title" style="margin-top:10px;"><i class="fa-solid fa-cloud-sun"></i> Weer in Breda</div>
+                <div class="card-title" style="margin-top:10px;"><i class="fa-solid fa-cloud-sun"></i> Weer</div>
                 <div class="weather-grid">
                     <div class="weather-box">
                         <i class="fa-solid fa-snowflake" style="color:#fff; margin-bottom:5px; font-size:1.2rem;" id="w-icon-temp"></i>
                         <span class="w-val" id="w-temp">--°</span>
-                        <span class="w-label">Temperatuur</span>
                     </div>
                     <div class="weather-box">
                         <i class="fa-solid fa-wind" style="color:#fff; margin-bottom:5px; font-size:1.2rem;"></i>
                         <span class="w-val" id="w-wind">--</span>
-                        <span class="w-label">Wind (km/h)</span>
                     </div>
                 </div>
             </div>
@@ -218,7 +214,7 @@
             <div class="rain-section">
                 <div class="rain-header">
                     <span><i class="fa-solid fa-cloud-rain" style="color:var(--c-rain); margin-right:5px;"></i> Neerslag (2u)</span>
-                    <span id="rain-status" style="font-size:0.75rem; color:var(--text-main);">Laden...</span>
+                    <span id="rain-status" style="font-size:0.75rem; color:var(--text-main);">...</span>
                 </div>
                 <div class="chart-container">
                     <canvas id="rainChart"></canvas>
@@ -227,7 +223,7 @@
         </section>
 
         <section class="card area-list">
-            <div class="card-title"><i class="fa-solid fa-list-ul"></i> Vertrek Opties</div>
+            <div class="card-title"><i class="fa-solid fa-list-ul"></i> Bus Opties</div>
             <div class="list-container" id="timetable-list"></div>
         </section>
     </main>
@@ -235,49 +231,162 @@
     <div class="modal" id="settings-modal">
         <div class="modal-content">
             <h2 style="color:white; margin-bottom:20px;">Instellingen</h2>
+            <div class="input-group">
+                <label style="color:var(--c-ns)">NS API Key</label>
+                <input type="password" id="inp-ns-key" placeholder="Plak hier je NS key">
+            </div>
+            <div class="input-group" style="position:relative;">
+                <label style="color:var(--c-ns)">NS Station</label>
+                <input type="text" id="inp-station" placeholder="Bijv. Bd" onkeyup="searchStation(this.value)">
+                <div class="suggestion-box" id="station-suggestions"></div>
+            </div>
+            <hr style="border:0; border-top:1px solid var(--border); margin: 20px 0;">
             <div class="input-group"><label>Fietsen (min)</label><input type="number" id="inp-bike"></div>
-            <div class="input-group"><label>Buffer/Wachten (min)</label><input type="number" id="inp-buffer"></div>
+            <div class="input-group"><label>Buffer (min)</label><input type="number" id="inp-buffer"></div>
             <div class="input-group"><label>Busrit (min)</label><input type="number" id="inp-bus"></div>
-            <div class="input-group"><label>Lopen naar huis (min)</label><input type="number" id="inp-walk"></div>
+            <div class="input-group"><label>Lopen (min)</label><input type="number" id="inp-walk"></div>
             <button class="save-btn" onclick="saveSettings()">Opslaan</button>
         </div>
     </div>
 
     <script>
-        // CONFIG
+        // --- 1. CONFIGURATIE ---
         let config = {
             bike: parseInt(localStorage.getItem('bike')) || 10,
             buffer: parseInt(localStorage.getItem('buffer')) || 5,
             bus: parseInt(localStorage.getItem('bus')) || 23,
             walk: parseInt(localStorage.getItem('walk')) || 5,
-            direction: localStorage.getItem('direction') || 'home' // 'home' (Naar Chaam) of 'work' (Naar Breda)
+            direction: localStorage.getItem('direction') || 'home',
+            nsKey: localStorage.getItem('nsKey') || '',
+            station: localStorage.getItem('station') || 'Bd'
         };
 
-        const DIENSTREGELING_CHAAM = { // Vanaf Breda CS
-            6: [25, 55], 7: [25, 55], 8: [25, 55], 9: [25, 55], 10: [25, 55],
-            11: [25, 55], 12: [25, 55], 13: [25, 55], 14: [25, 55], 15: [25, 55],
-            16: [25, 40, 55], 17: [10, 25, 40, 55], 18: [25, 55], 19: [25, 55],
-            20: [25, 55], 21: [25], 22: [25], 23: [25]
+        // --- 2. DIENSTREGELING (PDF 2025) ---
+        // Vanaf Breda CS (Lijn 375 weekdag)
+        const SCH_HOME = { 
+            6:[19,49], 7:[19,49], 8:[19,49], 9:[19,49], 10:[19,49], 11:[19,49],
+            12:[19,49], 13:[19,49], 14:[19,49], 15:[19,49], 16:[19,49], 17:[19,49],
+            18:[19,51], 19:[26,56], 20:[26], 21:[26], 22:[26], 23:[26], 0:[26]
         };
 
-        const DIENSTREGELING_BREDA = { // Vanaf Meysberg (Schatting)
-            6: [20, 50], 7: [20, 50], 8: [20, 50], 9: [20, 50], 10: [20, 50],
-            11: [20, 50], 12: [20, 50], 13: [20, 50], 14: [20, 50], 15: [20, 50],
-            16: [20, 50], 17: [20, 50], 18: [20, 50], 19: [20, 50], 20: [20, 50],
-            21: [20], 22: [20]
+        // Vanaf Chaam, Meysberg (Lijn 375 weekdag) - Richting Breda
+        const SCH_WORK = { 
+            5:[41], 6:[11,26,41,56], 7:[11,26,41,56], 8:[11,26,41,56], 9:[11,26,41],
+            10:[11,41], 11:[11,41], 12:[11,41], 13:[11,41], 14:[11,41],
+            15:[11,26,41,56], 16:[11,26,41,56], 17:[11,26,41,56], 18:[11,41],
+            19:[11,41], 20:[13,43], 21:[13], 22:[12], 23:[12]
         };
 
         let rainChartInstance = null;
 
-        // --- TOGGLE FUNCTIE ---
-        function toggleDirection() {
-            config.direction = (config.direction === 'home') ? 'work' : 'home';
-            localStorage.setItem('direction', config.direction);
-            updateVisuals();
-            updateApp();
+        // --- 3. CORE LOGIC ---
+        function updateApp() {
+            try {
+                const now = new Date();
+                const list = document.getElementById('timetable-list');
+                list.innerHTML = "";
+                let nextOption = null;
+
+                const schema = (config.direction === 'home') ? SCH_HOME : SCH_WORK;
+                const firstLeg = (config.direction === 'home') ? config.bike : config.walk;
+                const lastLeg = (config.direction === 'home') ? config.walk : config.bike;
+                const totalDelay = firstLeg + config.buffer;
+
+                // Zoek opties: Vandaag en Morgen (voor als het laat is)
+                let attempts = [0, 1]; // 0 = vandaag, 1 = morgen
+                let foundOptions = 0;
+
+                attempts.forEach(dayOffset => {
+                    if (foundOptions > 5) return; // Genoeg gevonden
+
+                    for (let uur = 0; uur < 24; uur++) {
+                        if (schema[uur]) {
+                            for (let minuut of schema[uur]) {
+                                // Bereken datum bus
+                                let busDate = new Date(now);
+                                busDate.setDate(busDate.getDate() + dayOffset);
+                                busDate.setHours(uur, minuut, 0, 0);
+
+                                let vertrekDate = new Date(busDate.getTime() - (totalDelay * 60000));
+                                let aankomstDate = new Date(busDate.getTime() + ((config.bus + lastLeg) * 60000));
+
+                                // Alleen tonen als vertrek in de toekomst is
+                                if (vertrekDate > now) {
+                                    foundOptions++;
+                                    let vStr = vertrekDate.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
+                                    let bStr = busDate.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
+                                    let aStr = aankomstDate.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
+                                    
+                                    // Dag label als het morgen is
+                                    let dayLabel = dayOffset === 1 ? '<span style="color:var(--accent-orange); font-size:0.7em"> (Morgen)</span>' : '';
+
+                                    let div = document.createElement('div');
+                                    div.className = "timetable-row";
+                                    
+                                    // Eerste optie opslaan
+                                    if (!nextOption) {
+                                        nextOption = { vertrek: vertrekDate, bus: bStr, aankomst: aStr, isTomorrow: dayOffset === 1 };
+                                        div.classList.add('active');
+                                    }
+
+                                    const startTxt = (config.direction === 'home') ? 'Fietsen' : 'Lopen';
+                                    const endTxt = (config.direction === 'home') ? 'Thuis' : 'Tramsingel';
+                                    
+                                    div.innerHTML = `
+                                        <div><span class="t-big">${vStr}</span><span class="t-small">${startTxt}${dayLabel}</span></div>
+                                        <div style="text-align:center; font-size:0.8em; color:var(--text-muted)">
+                                            <i class="fa-solid fa-arrow-right"></i><br>Bus ${bStr}
+                                        </div>
+                                        <div style="text-align:right"><span class="t-big">${aStr}</span><span class="t-small">${endTxt}</span></div>
+                                    `;
+                                    list.appendChild(div);
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Update Countdown
+                const mainTime = document.getElementById('leave-time');
+                const subText = document.getElementById('countdown-text');
+                const badge = document.getElementById('bus-badge');
+
+                if (nextOption) {
+                    mainTime.innerText = nextOption.vertrek.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
+                    badge.innerText = `Bus ${nextOption.bus}`;
+                    
+                    const diff = Math.floor((nextOption.vertrek - now) / 1000);
+                    
+                    if (nextOption.isTomorrow) {
+                        subText.innerText = "Eerste optie morgen";
+                        subText.className = "sub-text urgent";
+                        mainTime.style.color = "var(--text-muted)";
+                    } else {
+                        const min = Math.floor(diff / 60);
+                        const sec = diff % 60;
+                        if (min >= 60) {
+                            subText.innerText = `Nog ${Math.floor(min/60)}u ${min%60}m`;
+                            subText.className = "sub-text";
+                            mainTime.style.color = "var(--text-main)";
+                        } else {
+                            subText.innerText = `Vertrek over ${min} min ${sec} sec`;
+                            if (min < 5) { mainTime.style.color = "var(--accent-red)"; subText.className = "sub-text critical"; }
+                            else if (min < 15) { mainTime.style.color = "var(--accent-orange)"; subText.className = "sub-text urgent"; }
+                            else { mainTime.style.color = "var(--accent-red)"; subText.className = "sub-text"; }
+                        }
+                    }
+                } else {
+                    mainTime.innerText = "--:--";
+                    subText.innerText = "Geen data gevonden";
+                    badge.innerText = "--";
+                }
+
+            } catch (err) {
+                console.error("Update Error:", err);
+                document.getElementById('countdown-text').innerText = "Fout in berekening";
+            }
         }
 
-        // --- UPDATE VISUALS ---
         function updateVisuals() {
             const total = config.bike + config.buffer + config.bus + config.walk;
             const pBike = (config.bike / total * 100) + "%";
@@ -285,190 +394,163 @@
             const pBus = (config.bus / total * 100) + "%";
             const pWalk = (config.walk / total * 100) + "%";
 
-            const elements = ['seg-1', 'seg-2', 'seg-3', 'seg-4', 'dot-1', 'dot-2', 'dot-3', 'dot-4', 'lbl-1', 'lbl-3', 'lbl-4', 'btn-toggle', 'hero-title'];
-            const ui = {}; elements.forEach(id => ui[id] = document.getElementById(id));
+            const ui = {
+                seg1: document.getElementById('seg-1'), seg2: document.getElementById('seg-2'),
+                seg3: document.getElementById('seg-3'), seg4: document.getElementById('seg-4'),
+                dot1: document.getElementById('dot-1'), dot2: document.getElementById('dot-2'),
+                dot3: document.getElementById('dot-3'), dot4: document.getElementById('dot-4'),
+                lbl1: document.getElementById('lbl-1'), lbl3: document.getElementById('lbl-3'), 
+                lbl4: document.getElementById('lbl-4'), btn: document.getElementById('btn-toggle'),
+                title: document.getElementById('hero-title')
+            };
 
             if (config.direction === 'home') {
-                ui['btn-toggle'].classList.remove('active');
-                ui['hero-title'].innerHTML = '<i class="fa-solid fa-stopwatch"></i> Vertrek Tramsingel';
+                ui.btn.classList.remove('active');
+                ui.title.innerHTML = '<i class="fa-solid fa-stopwatch"></i> Vertrek Tramsingel';
                 
-                ui['seg-1'].style.width = pBike; ui['seg-1'].style.backgroundColor = 'var(--c-bike)';
-                ui['seg-2'].style.width = pWait; ui['seg-2'].style.backgroundColor = 'var(--c-wait)';
-                ui['seg-3'].style.width = pBus;  ui['seg-3'].style.backgroundColor = 'var(--c-bus)';
-                ui['seg-4'].style.width = pWalk; ui['seg-4'].style.backgroundColor = 'var(--c-walk)';
-
-                ui['dot-1'].style.backgroundColor = 'var(--c-bike)';
-                ui['dot-2'].style.backgroundColor = 'var(--c-wait)';
-                ui['dot-3'].style.backgroundColor = 'var(--c-bus)';
-                ui['dot-4'].style.backgroundColor = 'var(--c-walk)';
-
-                ui['lbl-1'].innerText = config.bike + "m (Fiets)";
-                ui['lbl-3'].innerText = config.bus + "m";
-                ui['lbl-4'].innerText = config.walk + "m (Thuis)";
+                ui.seg1.style.width=pBike; ui.seg1.style.background='var(--c-bike)';
+                ui.seg2.style.width=pWait; ui.seg2.style.background='var(--c-wait)';
+                ui.seg3.style.width=pBus;  ui.seg3.style.background='var(--c-bus)';
+                ui.seg4.style.width=pWalk; ui.seg4.style.background='var(--c-walk)';
+                
+                ui.dot1.style.background='var(--c-bike)'; ui.lbl1.innerText = config.bike + "m (Fiets)";
+                ui.dot2.style.background='var(--c-wait)';
+                ui.dot3.style.background='var(--c-bus)'; ui.lbl3.innerText = config.bus + "m";
+                ui.dot4.style.background='var(--c-walk)'; ui.lbl4.innerText = config.walk + "m (Thuis)";
             } else {
-                ui['btn-toggle'].classList.add('active');
-                ui['hero-title'].innerHTML = '<i class="fa-solid fa-person-walking"></i> Vertrek Alphensebaan';
+                ui.btn.classList.add('active');
+                ui.title.innerHTML = '<i class="fa-solid fa-person-walking"></i> Vertrek Alphensebaan';
+                
+                ui.seg1.style.width=pWalk; ui.seg1.style.background='var(--c-walk)';
+                ui.seg2.style.width=pWait; ui.seg2.style.background='var(--c-wait)';
+                ui.seg3.style.width=pBus;  ui.seg3.style.background='var(--c-bus)';
+                ui.seg4.style.width=pBike; ui.seg4.style.background='var(--c-bike)';
 
-                ui['seg-1'].style.width = pWalk; ui['seg-1'].style.backgroundColor = 'var(--c-walk)';
-                ui['seg-2'].style.width = pWait; ui['seg-2'].style.backgroundColor = 'var(--c-wait)';
-                ui['seg-3'].style.width = pBus;  ui['seg-3'].style.backgroundColor = 'var(--c-bus)';
-                ui['seg-4'].style.width = pBike; ui['seg-4'].style.backgroundColor = 'var(--c-bike)';
-
-                ui['dot-1'].style.backgroundColor = 'var(--c-walk)';
-                ui['dot-2'].style.backgroundColor = 'var(--c-wait)';
-                ui['dot-3'].style.backgroundColor = 'var(--c-bus)';
-                ui['dot-4'].style.backgroundColor = 'var(--c-bike)';
-
-                ui['lbl-1'].innerText = config.walk + "m (Loop)";
-                ui['lbl-3'].innerText = config.bus + "m";
-                ui['lbl-4'].innerText = config.bike + "m (Werk)";
+                ui.dot1.style.background='var(--c-walk)'; ui.lbl1.innerText = config.walk + "m (Loop)";
+                ui.dot2.style.background='var(--c-wait)';
+                ui.dot3.style.background='var(--c-bus)'; ui.lbl3.innerText = config.bus + "m";
+                ui.dot4.style.background='var(--c-bike)'; ui.lbl4.innerText = config.bike + "m (Werk)";
             }
         }
 
-        // --- APP LOGICA ---
-        function updateApp() {
-            const nu = new Date();
-            const list = document.getElementById('timetable-list');
-            list.innerHTML = "";
-            let nextOption = null;
-
-            const schema = (config.direction === 'home') ? DIENSTREGELING_CHAAM : DIENSTREGELING_BREDA;
-            const firstLeg = (config.direction === 'home') ? config.bike : config.walk;
-            const lastLeg = (config.direction === 'home') ? config.walk : config.bike;
-            const totalDelay = firstLeg + config.buffer;
-
-            for (let uur = 0; uur < 24; uur++) {
-                if (schema[uur]) {
-                    for (let minuut of schema[uur]) {
-                        let busDate = new Date(nu); busDate.setHours(uur, minuut, 0);
-                        let vertrekDate = new Date(busDate.getTime() - (totalDelay * 60000));
-                        let aankomstDate = new Date(busDate.getTime() + ((config.bus + lastLeg) * 60000));
-
-                        let vStr = vertrekDate.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
-                        let bStr = busDate.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
-                        let aStr = aankomstDate.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
-
-                        let div = document.createElement('div');
-                        div.className = "timetable-row";
-
-                        if (vertrekDate < nu) {
-                            div.classList.add('past'); 
-                        } else {
-                            if (!nextOption) {
-                                nextOption = { vertrek: vertrekDate, bus: bStr, aankomst: aStr };
-                                div.classList.add('active');
-                            }
-                        }
-
-                        if (vertrekDate > new Date(nu.getTime() - 3600000)) {
-                            const startTxt = (config.direction === 'home') ? 'Fietsen' : 'Lopen';
-                            const endTxt = (config.direction === 'home') ? 'Thuis' : 'Tramsingel';
-                            div.innerHTML = `
-                                <div><span class="t-big">${vStr}</span><span class="t-small">${startTxt}</span></div>
-                                <div style="text-align:center; font-size:0.8em; color:var(--text-muted)">
-                                    <i class="fa-solid fa-arrow-right"></i><br>Bus ${bStr}
-                                </div>
-                                <div style="text-align:right"><span class="t-big">${aStr}</span><span class="t-small">${endTxt}</span></div>
-                            `;
-                            list.appendChild(div);
-                        }
-                    }
-                }
+        // --- 4. NS API ---
+        async function fetchNSData() {
+            const container = document.getElementById('ns-departures');
+            if(!config.nsKey) {
+                container.innerHTML = `<div style="text-align:center; padding:15px; color:var(--text-muted)">Stel NS Key in via instellingen</div>`;
+                return;
             }
-
-            if (nextOption) {
-                document.getElementById('leave-time').innerText = nextOption.vertrek.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
-                document.getElementById('bus-badge').innerText = `Bus ${nextOption.bus}`;
-                const diff = Math.floor((nextOption.vertrek - nu) / 1000);
-                const min = Math.floor(diff / 60);
-                const sec = diff % 60;
-                const sub = document.getElementById('countdown-text');
-                const main = document.getElementById('leave-time');
-
-                if (min > 60) {
-                    sub.innerText = `Nog ${Math.floor(min/60)}u ${min%60}m`;
-                    sub.className = "sub-text";
-                    main.style.color = "var(--text-main)";
-                } else {
-                    sub.innerText = `Vertrek over ${min} min ${sec} sec`;
-                    if (min < 5) { main.style.color = "var(--accent-red)"; sub.className = "sub-text critical"; }
-                    else if (min < 15) { main.style.color = "var(--accent-orange)"; sub.className = "sub-text urgent"; }
-                    else { main.style.color = "var(--accent-red)"; sub.className = "sub-text"; }
+            document.getElementById('station-name').innerText = config.station.toUpperCase();
+            
+            try {
+                // Disruptions
+                const disRes = await fetch(`https://gateway.apiportal.ns.nl/disruptions/v3/station/${config.station}`, { headers: { 'Ocp-Apim-Subscription-Key': config.nsKey } });
+                const disData = await disRes.json();
+                const alertBox = document.getElementById('ns-disruptions');
+                alertBox.innerHTML = '';
+                if(disData.length > 0) {
+                    disData.forEach(d => {
+                        const div = document.createElement('div');
+                        div.className = 'ns-alert';
+                        div.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> <span>${d.verstoring.titel}</span>`;
+                        alertBox.appendChild(div);
+                    });
                 }
-            } else {
-                document.getElementById('leave-time').innerText = "--:--";
-                document.getElementById('countdown-text').innerText = "Geen bussen meer";
+
+                // Departures
+                const depRes = await fetch(`https://gateway.apiportal.ns.nl/reisinformatie-api/api/v2/departures?station=${config.station}&maxJourneys=4`, { headers: { 'Ocp-Apim-Subscription-Key': config.nsKey } });
+                const depData = await depRes.json();
+                
+                if(depData.payload && depData.payload.departures) {
+                    let html = '';
+                    depData.payload.departures.forEach(dep => {
+                        const time = new Date(dep.plannedDateTime).toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'});
+                        const dest = dep.direction;
+                        const track = dep.plannedTrack || '?';
+                        html += `<div class="ns-row"><div class="ns-time">${time}</div><div class="ns-dest">${dest}</div><div class="ns-track">${track}</div></div>`;
+                    });
+                    container.innerHTML = html;
+                    document.getElementById('ns-status').innerText = "Live";
+                }
+            } catch(e) {
+                container.innerHTML = `<div style="text-align:center; color:var(--accent-red)">Fout bij laden NS data</div>`;
             }
         }
 
-        // --- WEER ---
-        async function fetchAllWeather() {
+        async function searchStation(q) {
+            const box = document.getElementById('station-suggestions');
+            if(q.length < 2 || !config.nsKey) { box.style.display='none'; return; }
+            try {
+                const res = await fetch(`https://gateway.apiportal.ns.nl/places-api/v2/autosuggest?q=${q}&type=station`, { headers: { 'Ocp-Apim-Subscription-Key': config.nsKey } });
+                const data = await res.json();
+                if(data.payload) {
+                    box.innerHTML = ''; box.style.display = 'block';
+                    data.payload.forEach(s => {
+                        if(s.type === 'station') {
+                            let div = document.createElement('div');
+                            div.className = 'suggestion-item';
+                            div.innerText = `${s.name} (${s.identifiers.stationCode})`;
+                            div.onclick = () => { document.getElementById('inp-station').value = s.identifiers.stationCode; box.style.display='none'; };
+                            box.appendChild(div);
+                        }
+                    });
+                }
+            } catch(e) {}
+        }
+
+        // --- 5. WEATHER & SETTINGS ---
+        async function fetchWeather() {
             try {
                 const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=51.58&longitude=4.77&current_weather=true&minutely_15=precipitation&forecast_days=1&timezone=Europe%2FBerlin');
                 const data = await res.json();
-                const temp = Math.round(data.current_weather.temperature);
-                const wind = data.current_weather.windspeed;
-                document.getElementById('w-temp').innerText = temp + "°";
-                document.getElementById('w-wind').innerText = wind;
-                const tIcon = document.getElementById('w-icon-temp');
-                if(temp < 8) tIcon.className = "fa-solid fa-snowflake";
-                else if(temp > 22) tIcon.className = "fa-solid fa-sun";
-                else tIcon.className = "fa-solid fa-cloud";
-                drawChart(data.minutely_15);
-            } catch (e) {
-                document.getElementById('rain-status').innerText = "Offline";
-            }
-        }
+                document.getElementById('w-temp').innerText = Math.round(data.current_weather.temperature) + "°";
+                document.getElementById('w-wind').innerText = data.current_weather.windspeed;
+                
+                // Draw Chart
+                const now = new Date();
+                let startIndex = 0;
+                for(let i=0; i < data.minutely_15.time.length; i++) {
+                    if (new Date(data.minutely_15.time[i]) >= now) { startIndex = i; break; }
+                }
+                // Backup if near end of array
+                if (startIndex > data.minutely_15.time.length - 10) startIndex = data.minutely_15.time.length - 10;
 
-        function drawChart(rainData) {
-            const now = new Date();
-            const currentHour = now.getHours();
-            const currentMin = now.getMinutes();
-            let startIndex = 0;
-            for(let i=0; i < rainData.time.length; i++) {
-                const wTime = new Date(rainData.time[i]);
-                if (wTime.getHours() === currentHour && wTime.getMinutes() >= currentMin - 15) { startIndex = i; break; }
-            }
-            let labels = []; let dataPoints = []; let totalRain = 0;
-            for (let i = 0; i < 9; i++) {
-                const idx = startIndex + i;
-                if (idx >= rainData.precipitation.length) break;
-                const amount = rainData.precipitation[idx];
-                labels.push(new Date(rainData.time[idx]).toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'}));
-                dataPoints.push(amount); totalRain += amount;
-            }
-            const statusText = document.getElementById('rain-status');
-            if (totalRain === 0) { statusText.innerText = "Droog"; statusText.style.color = "var(--text-muted)"; }
-            else { statusText.innerText = "Regen verwacht"; statusText.style.color = "var(--c-rain)"; }
-
-            if (rainChartInstance) rainChartInstance.destroy();
-            const ctx = document.getElementById('rainChart').getContext('2d');
-            let gradient = ctx.createLinearGradient(0, 0, 0, 120);
-            gradient.addColorStop(0, 'rgba(96, 165, 250, 0.4)');
-            gradient.addColorStop(1, 'rgba(96, 165, 250, 0.0)');
-
-            rainChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{ label: 'mm', data: dataPoints, borderColor: '#60a5fa', backgroundColor: gradient, borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0 }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, suggestedMax: 1, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: {size:10} } },
-                        x: { grid: { display: false }, ticks: { color: '#64748b', font: {size:10} } }
+                let labels = []; let points = []; let rainSum = 0;
+                for(let i=0; i<8; i++) {
+                    let idx = startIndex + i;
+                    if(idx < data.minutely_15.precipitation.length) {
+                        let val = data.minutely_15.precipitation[idx];
+                        points.push(val); rainSum += val;
+                        labels.push(new Date(data.minutely_15.time[idx]).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}));
                     }
                 }
-            });
+                document.getElementById('rain-status').innerText = (rainSum > 0) ? "Regen verwacht" : "Droog";
+                document.getElementById('rain-status').style.color = (rainSum > 0) ? "var(--c-rain)" : "var(--text-muted)";
+
+                if(rainChartInstance) rainChartInstance.destroy();
+                const ctx = document.getElementById('rainChart').getContext('2d');
+                let grad = ctx.createLinearGradient(0,0,0,100); grad.addColorStop(0,'rgba(96,165,250,0.5)'); grad.addColorStop(1,'rgba(0,0,0,0)');
+                rainChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels: labels, datasets: [{data: points, borderColor:'#60a5fa', backgroundColor:grad, fill:true, tension:0.4, pointRadius:0}] },
+                    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}} }
+                });
+
+            } catch(e) { document.getElementById('rain-status').innerText = "Weer offline"; }
         }
 
+        function toggleDirection() {
+            config.direction = (config.direction === 'home') ? 'work' : 'home';
+            localStorage.setItem('direction', config.direction);
+            updateVisuals(); updateApp();
+        }
         function openSettings() {
             document.getElementById('inp-bike').value = config.bike;
             document.getElementById('inp-buffer').value = config.buffer;
             document.getElementById('inp-bus').value = config.bus;
             document.getElementById('inp-walk').value = config.walk;
+            document.getElementById('inp-ns-key').value = config.nsKey;
+            document.getElementById('inp-station').value = config.station;
             document.getElementById('settings-modal').style.display = 'flex';
         }
         function saveSettings() {
@@ -476,16 +558,27 @@
             config.buffer = parseInt(document.getElementById('inp-buffer').value);
             config.bus = parseInt(document.getElementById('inp-bus').value);
             config.walk = parseInt(document.getElementById('inp-walk').value);
-            localStorage.setItem('bike', config.bike); localStorage.setItem('buffer', config.buffer);
-            localStorage.setItem('bus', config.bus); localStorage.setItem('walk', config.walk);
-            document.getElementById('settings-modal').style.display = 'none';
-            updateVisuals(); updateApp();
-        }
-        window.onclick = (e) => { if(e.target == document.getElementById('settings-modal')) document.getElementById('settings-modal').style.display='none'; }
+            config.nsKey = document.getElementById('inp-ns-key').value;
+            config.station = document.getElementById('inp-station').value;
+            
+            localStorage.setItem('bike', config.bike); 
+            localStorage.setItem('buffer', config.buffer);
+            localStorage.setItem('bus', config.bus); 
+            localStorage.setItem('walk', config.walk);
+            localStorage.setItem('nsKey', config.nsKey);
+            localStorage.setItem('station', config.station);
 
-        updateVisuals(); updateApp(); fetchAllWeather();
+            document.getElementById('settings-modal').style.display = 'none';
+            updateVisuals(); updateApp(); fetchNSData();
+        }
+
+        // Init
+        window.onclick = (e) => { if(e.target == document.getElementById('settings-modal')) document.getElementById('settings-modal').style.display='none'; }
+        updateVisuals(); updateApp(); fetchWeather(); fetchNSData();
         setInterval(updateApp, 1000);
-        setInterval(fetchAllWeather, 300000);
+        setInterval(fetchWeather, 300000);
+        setInterval(fetchNSData, 60000);
+
     </script>
 </body>
 </html>
